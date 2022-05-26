@@ -57,6 +57,9 @@ type Entry struct {
 	// Prev is the last time this job was run, or the zero time if never.
 	Prev time.Time
 
+	// Prev ...
+	Duration time.Duration
+
 	// WrappedJob is the thing to run when the Schedule is activated.
 	WrappedJob Job
 
@@ -266,6 +269,7 @@ func (c *Cron) run() {
 						break
 					}
 					c.startJob(e.WrappedJob)
+					e.Duration = e.Next.Sub(e.Prev)
 					e.Prev = e.Next
 					e.Next = e.Schedule.Next(now)
 					c.logger.Info("run", "now", now, "entry", e.ID, "next", e.Next)
