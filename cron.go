@@ -162,6 +162,7 @@ func (c *Cron) Schedule(schedule Schedule, cmd Job) EntryID {
 		Schedule:   schedule,
 		WrappedJob: c.chain.Then(cmd),
 		Job:        cmd,
+		Prev:       time.Now(),
 	}
 	if !c.running {
 		c.entries = append(c.entries, entry)

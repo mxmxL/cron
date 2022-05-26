@@ -700,3 +700,25 @@ func stop(cron *Cron) chan bool {
 func newWithSeconds() *Cron {
 	return New(WithParser(secondParser), WithChain())
 }
+
+func Test_Cron(t *testing.T) {
+	var wg sync.WaitGroup
+	var id EntryID
+	var err error
+	c := New(WithSeconds())
+	id, err = c.AddFunc("*/11 * * * * *", func() {
+		ee := c.Entry(id)
+		prev := ee.Prev
+		next := ee.Next
+		t.Logf("%s prev: %s", time.Now().Format("2006-01-02 15:04:05"), prev.Format("2006-01-02 15:04:05"))
+		t.Logf("%s next: %s", time.Now().Format("2006-01-02 15:04:05"), next.Format("2006-01-02 15:04:05"))
+		t.Logf("duration: %v", ee.Duration)
+		t.Logf("tick...")
+	})
+	if err != nil {
+		t.Fatalf("%v", err)
+	}
+	wg.Add(1)
+	c.Start()
+	wg.Wait()
+}
